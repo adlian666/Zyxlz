@@ -262,4 +262,14 @@
     <servlet-name>QueryPeopleCollectionServlet</servlet-name>
     <url-pattern>/querypeoplecollection</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>IsCollectedServlet</display-name>
+    <servlet-name>IsCollectedServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.IsCollected</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>IsCollectedServlet</servlet-name>
+    <url-pattern>/iscollected</url-pattern>
+  </servlet-mapping>
 </web-app>

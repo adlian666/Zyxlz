@@ -659,8 +659,9 @@ public class DaoImpl implements Dao {
 		System.out.println(JSON.toJSONString(js));
 		return JSON.toJSONString(js);
 	}
-//查询该文章是否收藏
+//19.查看患者收藏的文章
 	public String queryPeopleCollection(String gUIDPeople) {
+
 		List<ArticleDoctorBean> article;
 		Map map = new HashMap();
 		String jsonString2 = null;
@@ -684,6 +685,30 @@ public class DaoImpl implements Dao {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return JSON.toJSONString(js);
+	}
+
+	//查看患者是否收藏文章
+	public String isCollected(String gUIDPeople, String gUIDArticle) {
+		List<PeopleCollectionBean> peopleCollection;
+		Map map = new HashMap();
+			try {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+			String sql = "SELECT * from people_collection WHERE GUIDPeople = '" + gUIDPeople + "' and GUIDArticle = '" + gUIDArticle + "'";
+			peopleCollection = qr.query(sql, new BeanListHandler<PeopleCollectionBean>(PeopleCollectionBean.class));
+			if(peopleCollection.size() == 0) {
+					map.put("Result", "未收藏");
+				} else {
+					map.put("Result", "已收藏");
+				}
+		
+
+			js = new JSONObject(map);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(JSON.toJSONString(js));
 		return JSON.toJSONString(js);
 	}
 

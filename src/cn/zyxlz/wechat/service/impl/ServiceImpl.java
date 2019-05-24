@@ -170,4 +170,9 @@ public class ServiceImpl implements Service {
 		return dao.queryPeopleCollection(gUIDPeople);
 	}
 
+	public String isCollected(String gUIDPeople, String gUIDArticle) {
+		// TODO Auto-generated method stub
+		return dao.isCollected(gUIDPeople,gUIDArticle);
+	}
+
 }

@@ -26,6 +26,8 @@ String queryPeopleInfo(String peopleCode);
 String queryPeopleCase(String peopleCode);
 String collectArticle(String gUIDPeople, String gUIDArticle);
 String queryPeopleCollection(String gUIDPeople);
+String isCollected(String gUIDPeople, String gUIDArticle);
+
 
 
 }
