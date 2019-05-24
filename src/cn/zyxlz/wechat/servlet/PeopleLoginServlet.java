@@ -52,8 +52,23 @@ public class PeopleLoginServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		String nickName = request.getParameter("nickName");
+		String gender = request.getParameter("gender");
+		String city = request.getParameter("city");
+		String province = request.getParameter("province");
+		String country  = request.getParameter("country");
+		String avatarUrl = request.getParameter("avatarUrl");
+		String code = request.getParameter("code");
+		String mancode = request.getParameter("caInnercode");
+		String openId = request.getParameter("openId");
+		String FormId = request.getParameter("FormId");
+		Object[] params = {openId,mancode,nickName,country,avatarUrl};
+		//调用添加方法
+		String str = service.peopleLogin(params);
+		response.setCharacterEncoding("UTF_8");
+		response.setHeader("Content-type", "text/html;charset=UTF-8");
+		PrintWriter writer = response.getWriter();
+		writer.write(str);
 	}
 
 }

@@ -158,9 +158,58 @@
     <servlet-name>wechatCheckServlet</servlet-name>
     <servlet-class>cn.zyxlz.wechat.servlet.wechat.wechatCheckServlet</servlet-class>
   </servlet>
-  
   <servlet-mapping>
     <servlet-name>wechatCheckServlet</servlet-name>
     <url-pattern>/wechatcheck</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>TestMessage</display-name>
+    <servlet-name>TestMessage</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.message.TestMessage</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TestMessage</servlet-name>
+    <url-pattern>/testmessage</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>FocusDoctor</display-name>
+    <servlet-name>FocusDoctor</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.FocusDoctor</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FocusDoctor</servlet-name>
+    <url-pattern>/focusdoctor</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>IsFocused</display-name>
+    <servlet-name>IsFocused</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.IsFocused</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>IsFocused</servlet-name>
+    <url-pattern>/isfocused</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>PostDoctorinfoServlet</display-name>
+    <servlet-name>PostDoctorinfoServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.PostDoctorinfoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PostDoctorinfoServlet</servlet-name>
+    <url-pattern>/postdoctorinfo</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>PostPeopleInfoServlet</display-name>
+    <servlet-name>PostPeopleInfoServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.PostPeopleInfoServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PostPeopleInfoServlet</servlet-name>
+    <url-pattern>/postpeopleinfo</url-pattern>
   </servlet-mapping>
 </web-app>

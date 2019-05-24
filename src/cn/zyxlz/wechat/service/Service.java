@@ -15,4 +15,11 @@ public interface Service {
 	String peopleLogin(Object[] params);
 	String getToken();
 	String offlineMessage(Object[] params);
+	String sendMessage(String openId, String template_id, String page, String form_id, String token);
+	String focusDoctor(String peopleCode, String doctorCode);
+	String isFocused(String peopleCode, String doctorCode);
+	String  postDoctorinfoServlet(Object[] doctorinfo, String manCode, String hospital);
+	String postPeopleInfo(Object[] peopleinfo, String peopleCode);
+	
+	
 }

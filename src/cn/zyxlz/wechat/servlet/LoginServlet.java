@@ -1,10 +1,14 @@
 package cn.zyxlz.wechat.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.alibaba.fastjson.JSONObject;
 
 import cn.zyxlz.wechat.service.Service;
 import cn.zyxlz.wechat.service.impl.ServiceImpl;
@@ -14,6 +18,7 @@ import cn.zyxlz.wechat.service.impl.ServiceImpl;
  */
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
        Service service = new ServiceImpl();
     /**
      * @see HttpServlet#HttpServlet()
@@ -30,8 +35,13 @@ public class LoginServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		String str = request.getParameter("code");
 		System.out.println(str);
-		service.login(str);
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+		String s  = service.login(str);
+		
+		response.setCharacterEncoding("UTF_8");
+		response.setHeader("Content-type", "text/html;charset=UTF-8");
+		PrintWriter writer = response.getWriter();
+		writer.write(s);
+
 	}
 
 	/**
@@ -39,7 +49,14 @@ public class LoginServlet extends HttpServlet {
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
-		doGet(request, response);
+		String str = request.getParameter("code");
+		
+		String s  = service.login(str);
+		System.out.println("openid="+s);
+		response.setCharacterEncoding("UTF_8");
+		response.setHeader("Content-type", "text/html;charset=UTF-8");
+		PrintWriter writer = response.getWriter();
+		writer.write(s);
 	}
 
 }

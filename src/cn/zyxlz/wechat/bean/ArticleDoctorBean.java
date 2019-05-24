@@ -153,12 +153,7 @@ public class ArticleDoctorBean {
 	public void setManWeChat(String manWeChat) {
 		ManWeChat = manWeChat;
 	}
-	public Boolean getManAdmin() {
-		return ManAdmin;
-	}
-	public void setManAdmin(Boolean manAdmin) {
-		ManAdmin = manAdmin;
-	}
+	
 	public String getManResume() {
 		return ManResume;
 	}
@@ -276,6 +271,20 @@ public class ArticleDoctorBean {
 		ManHeadimg = manHeadimg;
 	}
 
+	public String getManAdmin() {
+		return ManAdmin;
+	}
+	public void setManAdmin(String manAdmin) {
+		ManAdmin = manAdmin;
+	}
+
+	public String getOpenId() {
+		return OpenId;
+	}
+	public void setOpenId(String openId) {
+		OpenId = openId;
+	}
+
 	private String GUIDArticle;
 	private String GUIDMan;
 	private String GUIDArticleStatus;
@@ -302,7 +311,7 @@ public class ArticleDoctorBean {
 	private String ManPhone;
 	private String ManQQ;
 	private String ManWeChat;
-	private Boolean ManAdmin;
+	private String ManAdmin;
 	private String ManResume;
 	private String ManDiagnose;
 	private String ManAchievement;
@@ -323,6 +332,6 @@ public class ArticleDoctorBean {
 	private String ShareNumber;
 	private String CommentStatus;
 	private String CommentNumber;
-	
+	private String OpenId;
 	
 }

@@ -1,10 +1,13 @@
 package cn.zyxlz.wechat.service.impl;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 
 import cn.zyxlz.wechat.bean.PeopleCaseBean;
 import cn.zyxlz.wechat.dao.Dao;
@@ -18,8 +21,8 @@ import okhttp3.Response;
 
 public class ServiceImpl implements Service {
 	Dao dao = new DaoImpl();
-	String openid;
-
+	
+	JSONObject js;
 	public String queryAll() {
 		// TODO Auto-generated method stub
 		return dao.findAll();
@@ -57,7 +60,7 @@ public class ServiceImpl implements Service {
 
 	// 登陆
 	public String login(String str) {
-
+		String  res;
 		OkHttpClient okhttp = new OkHttpClient();
 		Request request = new Request.Builder().get()
 				.url("https://api.weixin.qq.com/sns/jscode2session?" + "appid=" + "wxea1a33993b78bd88" + "&secret="
@@ -75,18 +78,22 @@ public class ServiceImpl implements Service {
 
 			public void onResponse(Call arg0, Response arg1) throws IOException {
 				// TODO Auto-generated method stub
-
-				String res = arg1.body().string();
+				String openid;
+				String  res = arg1.body().string();
 				System.out.println("res2:" + res);
 				com.alibaba.fastjson.JSONObject jsonObject = JSON.parseObject(res);
-
+			
 				openid = jsonObject.getString("openid");
-				System.out.println("openid3:" + openid);
-
+				
+				Map map = new HashMap();
+				map.put("openid",openid);
+				js = new JSONObject(map);
+			
+				
 			}
 
 		});
-		return openid;
+		return JSON.toJSONString(js);
 	}
 
 
@@ -110,6 +117,33 @@ public class ServiceImpl implements Service {
 	public String offlineMessage(Object[] params) {
 		// TODO Auto-generated method stub
 		return dao.offlineMessage(params);
+	}
+//发送模板消息
+	public String sendMessage(String openId, String template_id, String page, String form_id, String token) {
+		// TODO Auto-generated method stub
+		return dao.sendMessage(openId,template_id,page,form_id,token);
+	}
+//加关注医生
+	public String focusDoctor(String peopleCode, String doctorCode) {
+		// TODO Auto-generated method stub
+		return dao.focusDoctor(peopleCode,doctorCode);
+	}
+
+	public String isFocused(String peopleCode, String doctorCode) {
+		// TODO Auto-generated method stub
+		return dao.isFocused(peopleCode,doctorCode);
+	}
+
+	
+
+	public String postDoctorinfoServlet(Object[] doctorinfo, String manCode,String hospital) {
+		// TODO Auto-generated method stub
+		return dao.postDoctorInfo(doctorinfo,manCode,hospital);
+	}
+
+	public String postPeopleInfo(Object[] peopleinfo, String peopleCode) {
+		// TODO Auto-generated method stub
+		return dao.postPeopleInfo(peopleinfo,peopleCode);
 	}
 
 }

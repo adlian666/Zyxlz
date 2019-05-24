@@ -105,12 +105,8 @@ public class DoctorBean {
 	public void setManWeChat(String manWeChat) {
 		ManWeChat = manWeChat;
 	}
-	public Boolean getManAdmin() {
-		return ManAdmin;
-	}
-	public void setManAdmin(Boolean manAdmin) {
-		ManAdmin = manAdmin;
-	}
+	
+	
 	public String getManResume() {
 		return ManResume;
 	}
@@ -168,6 +164,26 @@ public class DoctorBean {
 		HospitalName = hospitalName;
 	}
 
+	public String getManAdmin() {
+		return ManAdmin;
+	}
+	public void setManAdmin(String manAdmin) {
+		ManAdmin = manAdmin;
+	}
+	public String getOpenId() {
+		return OpenId;
+	}
+	public void setOpenId(String openId) {
+		OpenId = openId;
+	}
+
+	public String getWorkTime() {
+		return WorkTime;
+	}
+	public void setWorkTime(String workTime) {
+		WorkTime = workTime;
+	}
+
 	private String GUIDMan;
 	private String HospitalOrganizationCode;
 	private String SocietyOrganizationCode;
@@ -185,7 +201,7 @@ public class DoctorBean {
 	private String ManPhone;
 	private String ManQQ;
 	private String ManWeChat;
-	private Boolean ManAdmin;
+	private String ManAdmin;
 	private String ManResume;
 	private String ManDiagnose;
 	private String ManAchievement;
@@ -193,7 +209,8 @@ public class DoctorBean {
 	private String ManIDCard;
 	private String ManNation;
 	private String ManHeadimg;
-	
+	private String OpenId;
 	private String HospitalOrganizationName;
 	private String HospitalName;
+	private String WorkTime;
 }
