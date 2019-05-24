@@ -48,9 +48,8 @@ public class ServiceImpl implements Service {
 		return dao.queryOrganizationDoctor(str);
 	}
 
-	public void uploadCase(PeopleCaseBean peoplecase) {
-		// TODO Auto-generated method stub
-		dao.uploadCase(peoplecase);
+	public String uploadCase(PeopleCaseBean peoplecase) {
+		return dao.uploadCase(peoplecase);
 	}
 
 	public String searchDoctor(String str) {
@@ -144,6 +143,31 @@ public class ServiceImpl implements Service {
 	public String postPeopleInfo(Object[] peopleinfo, String peopleCode) {
 		// TODO Auto-generated method stub
 		return dao.postPeopleInfo(peopleinfo,peopleCode);
+	}
+
+	public String queryMyDoctor(String peopleCode) {
+		// TODO Auto-generated method stub
+		return dao.queryMyDoctor(peopleCode);
+	}
+
+	public String queryPeopleInfo(String peopleCode) {
+		// TODO Auto-generated method stub
+		return dao.queryPeopleInfo(peopleCode);
+	}
+
+	public String queryPeopleCase(String peopleCode) {
+		// TODO Auto-generated method stub
+		return dao.queryPeopleCase(peopleCode);
+	}
+
+	public String collectArticle(String gUIDPeople, String gUIDArticle) {
+		// TODO Auto-generated method stub
+		return dao.collectArticle(gUIDPeople,gUIDArticle);
+	}
+
+	public String queryPeopleCollection(String gUIDPeople) {
+		// TODO Auto-generated method stub
+		return dao.queryPeopleCollection(gUIDPeople);
 	}
 
 }

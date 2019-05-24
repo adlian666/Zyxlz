@@ -8,7 +8,7 @@ public interface Service {
 	String postUserInfo(Object[] params);
 	String queryHospitalList();
 	String queryOrganizationDoctor(String str);
-	void uploadCase(PeopleCaseBean peoplecase);
+	String uploadCase(PeopleCaseBean peoplecase);
 	String searchDoctor(String str);
 	String login(String str);
 	String doctorLogin(Object[] params,String code);
@@ -20,6 +20,11 @@ public interface Service {
 	String isFocused(String peopleCode, String doctorCode);
 	String  postDoctorinfoServlet(Object[] doctorinfo, String manCode, String hospital);
 	String postPeopleInfo(Object[] peopleinfo, String peopleCode);
+	String queryMyDoctor(String peopleCode);
+	String queryPeopleInfo(String peopleCode);
+	String queryPeopleCase(String peopleCode);
+	String collectArticle(String gUIDPeople, String gUIDArticle);
+	String queryPeopleCollection(String gUIDPeople);
 	
 	
 }

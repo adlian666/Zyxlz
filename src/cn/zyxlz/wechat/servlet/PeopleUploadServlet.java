@@ -4,6 +4,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -88,9 +89,9 @@ public class PeopleUploadServlet extends HttpServlet {
 						filename = System.currentTimeMillis() + "." + names[i - 1];
 					
 						// 获得上传内容
-						InputStream in = item.getInputStream();
+						InputStream in = item.getInputStream();    
 						// 将in中的数据拷贝到服务器上
-						String path = this.getServletContext().getRealPath("upload");
+						String path = this.getServletContext().getRealPath("upload/people_case");
 						
 						OutputStream out = new FileOutputStream(path + "/" + filename);
 						IOUtils.copy(in, out);
@@ -99,10 +100,10 @@ public class PeopleUploadServlet extends HttpServlet {
 						out.close();
 						// 删除临时文件。
 						item.delete();
-						imgurl = imgurl + "##" + "upload/" + filename ;
+						imgurl =   "https://wechat.xust.edu.cn/Zyxlz/" + "upload/people_case/" + filename ;
 						System.out.println(filename);
 
-						map.put("CaseAttachment", "upload/" + filename);
+						map.put("CaseAttachment", "upload/people_case/" + filename);
 					}
 				}
 				System.out.println(imgurl);
@@ -112,12 +113,16 @@ public class PeopleUploadServlet extends HttpServlet {
 				peoplecase.setCaseContent(map.get("CaseContent").toString());
 				peoplecase.setGUIDCase(GUIDCase);
 				peoplecase.setPeopleCode(map.get("PeopleCode").toString());
-				peoplecase.setGUIDPeople(map.get("PeopleCode").toString());
+				//peoplecase.setGUIDPeople(map.get("PeopleCode").toString());
 				peoplecase.setCaseContent(map.get("CaseContent").toString());
 				peoplecase.setCaseAttachment(imgurl);
 				peoplecase.setCaseTime(new Date());
 				peoplecase.setReleaseTime(new Date());
-				service.uploadCase(peoplecase);
+				String s = service.uploadCase(peoplecase);
+				response.setCharacterEncoding("UTF_8");
+				response.setHeader("Content-type", "text/html;charset=UTF-8");
+				PrintWriter writer = response.getWriter();
+				writer.write(s);
 			}
 
 		} catch (Exception e) {

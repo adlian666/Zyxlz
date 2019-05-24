@@ -184,6 +184,19 @@ public class DoctorBean {
 		WorkTime = workTime;
 	}
 
+	public String getWorkPlace() {
+		return WorkPlace;
+	}
+	public void setWorkPlace(String workPlace) {
+		WorkPlace = workPlace;
+	}
+	public String getWorkDate() {
+		return WorkDate;
+	}
+	public void setWorkDate(String workDate) {
+		WorkDate = workDate;
+	}
+
 	private String GUIDMan;
 	private String HospitalOrganizationCode;
 	private String SocietyOrganizationCode;
@@ -213,4 +226,7 @@ public class DoctorBean {
 	private String HospitalOrganizationName;
 	private String HospitalName;
 	private String WorkTime;
+	private String WorkPlace;
+	private String WorkDate;
+	
 }

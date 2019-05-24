@@ -22,6 +22,7 @@ import cn.zyxlz.wechat.bean.IsfocusedBean;
 import cn.zyxlz.wechat.bean.OfflineMessageBean;
 import cn.zyxlz.wechat.bean.PeopleBean;
 import cn.zyxlz.wechat.bean.PeopleCaseBean;
+import cn.zyxlz.wechat.bean.PeopleCollectionBean;
 import cn.zyxlz.wechat.bean.SendTemplateMessage;
 import cn.zyxlz.wechat.bean.TemplateData;
 import cn.zyxlz.wechat.bean.TokenBean;
@@ -45,10 +46,13 @@ public class DaoImpl implements Dao {
 		String jsonString2 = null;
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "select  medicinedoctor.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n"
+			/*String sql = "select  medicinedoctor.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n"
 					+ "FROM medicinedoctor left join hospitalorganization on medicinedoctor.HospitalOrganizationCode = hospitalorganization.HospitalOrganizationCode\r\n"
-					+ "left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode;\r\n";
-
+					+ "left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode;\r\n";*/
+			String sql = "select  medicinedoctor.*,worktime.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n"
+					+ "FROM medicinedoctor left join hospitalorganization on medicinedoctor.HospitalOrganizationCode = hospitalorganization.HospitalOrganizationCode\r\n"
+					+ "left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode\r\n"
+			+ "left join worktime on medicinedoctor.GUIDMan = worktime.GUIDMan";
 			doctor = qr.query(sql, new BeanListHandler<DoctorBean>(DoctorBean.class));
 			if (doctor.size() != 0) {
 				map.put("Result", "success");
@@ -180,21 +184,32 @@ public class DaoImpl implements Dao {
 	}
 
 	// 上传附件
-	public void uploadCase(PeopleCaseBean peoplecase) {
+	public String uploadCase(PeopleCaseBean peoplecase) {
 
 		Map map = new HashMap();
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "INSERT INTO peoplecaselist VALUES (?,?,?,?,?,?,?,?,?)";
-			Object[] obj = { peoplecase.getGUIDCase(), peoplecase.getGUIDPeople(), peoplecase.getPeopleCode(),
+			String sql = "INSERT INTO peoplecaselist (GUIDCase,PeopleCode,CaseTime,CaseContent,CaseAttachment,AcceptDoctorCode,"
+					+ "AcceptTime,ReleaseTime)VALUES (?,?,?,?,?,?,?,?)";
+			Object[] obj = { peoplecase.getGUIDCase(),  peoplecase.getPeopleCode(),
 					peoplecase.getCaseTime(), peoplecase.getCaseContent(), peoplecase.getCaseAttachment(),
 					peoplecase.getAcceptDoctorCode(), peoplecase.getAcceptTime(), peoplecase.getReleaseTime() };
-			qr.update(sql, obj);
+			 int q = qr.update(sql, obj);
+			 if (q > 0) {
+					map.put("Result", "success");
+					
+				}
 
+				else {
+					map.put("Result", "fail");
+				}
+
+				js = new JSONObject(map);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return JSON.toJSONString(js);
 
 	}
 
@@ -467,7 +482,7 @@ public class DaoImpl implements Dao {
 		Object[] params = { peopleCode, doctorCode };
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "SELECT * from peoplefocuslist WHERE PeopleCode = ? and FocusDoctorCode = ?";
+			String sql = "SELECT * from peoplefocuslist WHERE PeopleCode = '" + peopleCode + "' and FocusDoctorCode = '" + doctorCode + "'";
 			Isfocused = qr.query(sql, new BeanListHandler<IsfocusedBean>(IsfocusedBean.class));
 			if (Isfocused.size() > 0) {
 				map.put("Result", "已关注");
@@ -528,6 +543,147 @@ public class DaoImpl implements Dao {
 			e.printStackTrace();
 		}
 		System.out.println(JSON.toJSONString(js));
+		return JSON.toJSONString(js);
+	}
+//查询我的医生
+	public String queryMyDoctor(String peopleCode) {
+		List<DoctorBean> doctor;
+		Map map = new HashMap();
+		String jsonString2 = null;
+		try {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+				String sql = "select  medicinedoctor.*,worktime.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n" + 
+						"					FROM medicinedoctor left join hospitalorganization on medicinedoctor.HospitalOrganizationCode = hospitalorganization.HospitalOrganizationCode\r\n" + 
+						"					left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode\r\n" + 
+						"			left join worktime on medicinedoctor.GUIDMan = worktime.GUIDMan\r\n" + 
+						"					where medicinedoctor.ManCode = (   SELECT FocusDoctorCode  FROM peoplefocuslist where PeopleCode = '" + peopleCode + "')";
+			doctor = qr.query(sql, new BeanListHandler<DoctorBean>(DoctorBean.class));
+			if (doctor.size() != 0) {
+				map.put("Result", "success");
+				map.put("Doctors", doctor);
+
+			} else {
+				map.put("Result", "fail");
+			}
+
+			js = new JSONObject(map);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return JSON.toJSONString(js);
+	}
+//查询患者个人信息
+	public String queryPeopleInfo(String peopleCode) {
+		List<PeopleBean> people;
+		Map map = new HashMap();
+		String jsonString2 = null;
+		try {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+				String sql = "select * from people where PeopleCode = "+peopleCode;
+				people = qr.query(sql, new BeanListHandler<PeopleBean>(PeopleBean.class));
+			if (people.size() != 0) {
+				map.put("Result", "success");
+				map.put("People", people);
+
+			} else {
+				map.put("Result", "fail");
+			}
+
+			js = new JSONObject(map);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return JSON.toJSONString(js);
+	}
+
+	//查询患者病历
+	public String queryPeopleCase(String peopleCode) {
+		List<PeopleCaseBean> peopleCase;
+		Map map = new HashMap();
+		String jsonString2 = null;
+		try {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+				String sql = "SELECT * FROM `peoplecaselist` WHERE PeopleCode = '"+peopleCode+"'";
+				peopleCase = qr.query(sql, new BeanListHandler<PeopleCaseBean>(PeopleCaseBean.class));
+			if (peopleCase.size() != 0) {
+				map.put("Result", "success");
+				map.put("PeopleCase", peopleCase);
+
+			} else {
+				map.put("Result", "fail");
+			}
+
+			js = new JSONObject(map);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return JSON.toJSONString(js);
+	}
+//收藏文章
+	public String collectArticle(String gUIDPeople, String gUIDArticle) {
+		List<PeopleCollectionBean> peopleCollection;
+		Map map = new HashMap();
+		String GUIDCollection = java.util.UUID.randomUUID().toString().replaceAll("-", "");
+		Object[] params = { GUIDCollection,gUIDPeople, gUIDArticle ,new Date()};
+		try {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+			String sql = "SELECT * from people_collection WHERE GUIDPeople = '" + gUIDPeople + "' and GUIDArticle = '" + gUIDArticle + "'";
+			peopleCollection = qr.query(sql, new BeanListHandler<PeopleCollectionBean>(PeopleCollectionBean.class));
+			if(peopleCollection.size() == 0) {
+				String sql1 = "insert into people_collection  (GUIDCollection,GUIDPeople,GUIDArticle,collect_time)VALUES(?,?,?,?)";
+				int r = qr.update(sql1, params);
+				if (r > 0) {
+					map.put("Result", "收藏成功");
+				} else {
+					map.put("Result", "收藏失败");
+				}
+			}else {
+				
+				String delete = "delete from people_collection WHERE GUIDPeople = '" + gUIDPeople + "' and GUIDArticle ='" + gUIDArticle + "'";
+				int d = qr.update(delete);
+				if (d > 0) {
+					map.put("Result", "取消收藏成功");
+				} else {
+					map.put("Result", "取消收藏失败");
+				}
+			}
+
+			js = new JSONObject(map);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(JSON.toJSONString(js));
+		return JSON.toJSONString(js);
+	}
+//查询该文章是否收藏
+	public String queryPeopleCollection(String gUIDPeople) {
+		List<ArticleDoctorBean> article;
+		Map map = new HashMap();
+		String jsonString2 = null;
+		try {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+			String sql = "SELECT article.*,medicinedoctor.ManName,articlestatus.*"
+					+ " FROM article left join medicinedoctor on article.GUIDMan = medicinedoctor.GUIDMan"
+					+ " left join articlestatus on article.GUIDArticleStatus = articlestatus.GUIDArticleStatus"
+					+ " where article.GUIDArticle = (SELECT GUIDArticle FROM people_collection WHERE GUIDPeople = '"+gUIDPeople+"')";
+			article = qr.query(sql, new BeanListHandler<ArticleDoctorBean>(ArticleDoctorBean.class));
+			if (article.size() != 0) {
+				map.put("Result", "success");
+				map.put("Articles", article);
+
+			} else {
+				map.put("Result", "fail");
+			}
+
+			js = new JSONObject(map);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return JSON.toJSONString(js);
 	}
 

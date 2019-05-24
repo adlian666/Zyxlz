@@ -212,4 +212,54 @@
     <servlet-name>PostPeopleInfoServlet</servlet-name>
     <url-pattern>/postpeopleinfo</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>QueryMyDoctorServlet</display-name>
+    <servlet-name>QueryMyDoctorServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.QueryMyDoctorServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>QueryMyDoctorServlet</servlet-name>
+    <url-pattern>/querymydoctor</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>QueryPeopleInfoServlet</display-name>
+    <servlet-name>QueryPeopleInfoServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.QueryPeopleInfo</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>QueryPeopleInfoServlet</servlet-name>
+    <url-pattern>/querypeopleinfo</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>QueryPeopleCaseServlet</display-name>
+    <servlet-name>QueryPeopleCaseServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.QueryPeopleCaseServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>QueryPeopleCaseServlet</servlet-name>
+    <url-pattern>/querypeoplecase</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>CollectArticleServlet</display-name>
+    <servlet-name>CollectArticleServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.CollectArticleServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>CollectArticleServlet</servlet-name>
+    <url-pattern>/collectarticle</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>QueryPeopleCollectionServlet</display-name>
+    <servlet-name>QueryPeopleCollectionServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.QueryPeopleCollectionServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>QueryPeopleCollectionServlet</servlet-name>
+    <url-pattern>/querypeoplecollection</url-pattern>
+  </servlet-mapping>
 </web-app>
