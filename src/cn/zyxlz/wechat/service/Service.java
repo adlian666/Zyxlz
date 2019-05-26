@@ -5,7 +5,7 @@ import cn.zyxlz.wechat.bean.PeopleCaseBean;
 public interface Service {
 	String queryAll();
 	String getArticles(String str);
-	String postUserInfo(Object[] params);
+	
 	String queryHospitalList();
 	String queryOrganizationDoctor(String str);
 	String uploadCase(PeopleCaseBean peoplecase);
@@ -26,6 +26,8 @@ public interface Service {
 	String collectArticle(String gUIDPeople, String gUIDArticle);
 	String queryPeopleCollection(String gUIDPeople);
 	String isCollected(String gUIDPeople, String gUIDArticle);
+	String postDoctorWorktime(Object[] obj);
+	String getDoctorWorktime(String gUIDMan);
 	
 	
 }

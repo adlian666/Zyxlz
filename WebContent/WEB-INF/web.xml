@@ -272,4 +272,33 @@
     <servlet-name>IsCollectedServlet</servlet-name>
     <url-pattern>/iscollected</url-pattern>
   </servlet-mapping>
+  <filter>
+    <display-name>LogFilter</display-name>
+    <filter-name>LogFilter</filter-name>
+    <filter-class>cn.zyxlz.wechat.servlet.filter.LogFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>LogFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <servlet>
+    <description></description>
+    <display-name>PostDoctorWorkTimeServlet</display-name>
+    <servlet-name>PostDoctorWorkTimeServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.doctor.PostDoctorWorktime</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>PostDoctorWorkTimeServlet</servlet-name>
+    <url-pattern>/postdoctorworktime</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <description></description>
+    <display-name>GetDoctorWorktimeServlet</display-name>
+    <servlet-name>GetDoctorWorktimeServlet</servlet-name>
+    <servlet-class>cn.zyxlz.wechat.servlet.doctor.GetDoctorWorktimeServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>GetDoctorWorktimeServlet</servlet-name>
+    <url-pattern>/getdoctorworktime</url-pattern>
+  </servlet-mapping>
 </web-app>

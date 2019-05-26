@@ -33,10 +33,7 @@ public class ServiceImpl implements Service {
 		return dao.getArticles(str);
 	}
 
-	public String postUserInfo(Object[] params) {
-		// TODO Auto-generated method stub
-		return dao.postUserInfo(params);
-	}
+	
 
 	public String queryHospitalList() {
 		// TODO Auto-generated method stub
@@ -81,14 +78,17 @@ public class ServiceImpl implements Service {
 				String  res = arg1.body().string();
 				System.out.println("res2:" + res);
 				com.alibaba.fastjson.JSONObject jsonObject = JSON.parseObject(res);
-			
-				openid = jsonObject.getString("openid");
-				
 				Map map = new HashMap();
+			if(jsonObject.containsKey("openid")) {
+				openid = jsonObject.getString("openid");
+				map.put("result","success");
 				map.put("openid",openid);
 				js = new JSONObject(map);
+			}else {
+				map.put("result","fail");
+				js = new JSONObject(map);
+			}
 			
-				
 			}
 
 		});
@@ -173,6 +173,16 @@ public class ServiceImpl implements Service {
 	public String isCollected(String gUIDPeople, String gUIDArticle) {
 		// TODO Auto-generated method stub
 		return dao.isCollected(gUIDPeople,gUIDArticle);
+	}
+
+	public String postDoctorWorktime(Object[] obj) {
+		// TODO Auto-generated method stub
+		return dao.postDoctorWorktime(obj);
+	}
+
+	public String getDoctorWorktime(String gUIDMan) {
+		// TODO Auto-generated method stub
+		return dao.getDoctorWorktime(gUIDMan);
 	}
 
 }

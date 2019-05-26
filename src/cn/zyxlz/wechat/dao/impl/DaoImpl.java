@@ -8,11 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.mysql.jdbc.Connection;
 
 import cn.zyxlz.wechat.bean.ArticleBean;
 import cn.zyxlz.wechat.bean.ArticleDoctorBean;
@@ -26,6 +29,7 @@ import cn.zyxlz.wechat.bean.PeopleCollectionBean;
 import cn.zyxlz.wechat.bean.SendTemplateMessage;
 import cn.zyxlz.wechat.bean.TemplateData;
 import cn.zyxlz.wechat.bean.TokenBean;
+import cn.zyxlz.wechat.bean.WorktimeBean;
 import cn.zyxlz.wechat.dao.Dao;
 import cn.zyxlz.wechat.utils.C3P0Utils;
 import okhttp3.Call;
@@ -46,13 +50,19 @@ public class DaoImpl implements Dao {
 		String jsonString2 = null;
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			/*String sql = "select  medicinedoctor.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n"
-					+ "FROM medicinedoctor left join hospitalorganization on medicinedoctor.HospitalOrganizationCode = hospitalorganization.HospitalOrganizationCode\r\n"
-					+ "left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode;\r\n";*/
+			/*
+			 * String sql =
+			 * "select  medicinedoctor.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n"
+			 * +
+			 * "FROM medicinedoctor left join hospitalorganization on medicinedoctor.HospitalOrganizationCode = hospitalorganization.HospitalOrganizationCode\r\n"
+			 * +
+			 * "left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode;\r\n"
+			 * ;
+			 */
 			String sql = "select  medicinedoctor.*,worktime.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n"
 					+ "FROM medicinedoctor left join hospitalorganization on medicinedoctor.HospitalOrganizationCode = hospitalorganization.HospitalOrganizationCode\r\n"
 					+ "left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode\r\n"
-			+ "left join worktime on medicinedoctor.GUIDMan = worktime.GUIDMan";
+					+ "left join worktime on medicinedoctor.GUIDMan = worktime.GUIDMan";
 			doctor = qr.query(sql, new BeanListHandler<DoctorBean>(DoctorBean.class));
 			if (doctor.size() != 0) {
 				map.put("Result", "success");
@@ -98,37 +108,6 @@ public class DaoImpl implements Dao {
 		}
 		return JSON.toJSONString(js);
 
-	}
-
-	public String postUserInfo(Object[] params) {
-		try {
-			List<PeopleBean> people;
-			Map map = new HashMap();
-			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			// 添加患者
-			String sql = "insert into people(GUIDPeople,PeopleCode,WechatnickName,gender,city,province,country,avatarUrl) values(?,?,?,?,?,?,?,?)";
-			qr.update(sql, params);
-			System.out.print(params[0]);
-
-			// 返回患者信息
-			Object s = params[0];
-			String sql1 = "select * from people where GUIDPeople = '" + s + "'";
-
-			people = qr.query(sql1, new BeanListHandler<PeopleBean>(PeopleBean.class));
-			if (people.size() != 0) {
-				map.put("Result", "success");
-				map.put("People", people);
-
-			} else {
-				map.put("Result", "fail");
-			}
-
-			js = new JSONObject(map);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return JSON.toJSONString(js);
 	}
 
 	// 查询医院列表
@@ -189,22 +168,22 @@ public class DaoImpl implements Dao {
 		Map map = new HashMap();
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "INSERT INTO peoplecaselist (GUIDCase,PeopleCode,CaseTime,CaseContent,CaseAttachment,AcceptDoctorCode,"
-					+ "AcceptTime,ReleaseTime)VALUES (?,?,?,?,?,?,?,?)";
-			Object[] obj = { peoplecase.getGUIDCase(),  peoplecase.getPeopleCode(),
+			String sql = "INSERT INTO peoplecaselist (GUIDCase,GUIDPeople,PeopleCode,CaseTime,CaseContent,CaseAttachment,AcceptDoctorCode,"
+					+ "AcceptTime,ReleaseTime)VALUES (?,?,?,?,?,?,?,?,?)";
+			Object[] obj = { peoplecase.getGUIDCase(), peoplecase.getGUIDPeople(), peoplecase.getPeopleCode(),
 					peoplecase.getCaseTime(), peoplecase.getCaseContent(), peoplecase.getCaseAttachment(),
 					peoplecase.getAcceptDoctorCode(), peoplecase.getAcceptTime(), peoplecase.getReleaseTime() };
-			 int q = qr.update(sql, obj);
-			 if (q > 0) {
-					map.put("Result", "success");
-					
-				}
+			int q = qr.update(sql, obj);
+			if (q > 0) {
+				map.put("Result", "success");
 
-				else {
-					map.put("Result", "fail");
-				}
+			}
 
-				js = new JSONObject(map);
+			else {
+				map.put("Result", "fail");
+			}
+
+			js = new JSONObject(map);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -269,22 +248,41 @@ public class DaoImpl implements Dao {
 		List<DoctorBean> doctor;
 		Map map = new HashMap();
 		String jsonString2 = null;
-
 		try {
 			// params[0] = openid;
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "insert ignore  into medicinedoctor(GUIDMan,ManCode,ManWeChat,ManNation,ManHeadimg)\r\n"
+			String sql = "insert  into medicinedoctor(GUIDMan,ManCode,ManWeChat,ManNation,ManHeadimg)\r\n"
 					+ "VALUES(?,?,?,?,?)";
-			String sql1 = "SELECT * from medicinedoctor WHERE GUIDMan = '" + params[0] + "'";
+			String sql1 = "SELECT * from medicinedoctor WHERE ManCode = '" + params[1] + "'";
 
-			qr.update(sql, params);
 			doctor = qr.query(sql1, new BeanListHandler<DoctorBean>(DoctorBean.class));
 			if (doctor.size() != 0) {
 				map.put("Result", "success");
 				map.put("Doctors", doctor);
 
 			} else {
-				map.put("Result", "fail");
+				int q = qr.update(sql, params);
+				if (q > 0) {
+
+					doctor = qr.query(sql1, new BeanListHandler<DoctorBean>(DoctorBean.class));
+					if (doctor.size() != 0) {
+						map.put("Result", "success");
+						map.put("Doctors", doctor);
+
+					} else {
+						map.put("Result", "fail");
+					}
+				} else {
+					doctor = qr.query(sql1, new BeanListHandler<DoctorBean>(DoctorBean.class));
+					if (doctor.size() != 0) {
+						map.put("Result", "success");
+						map.put("Doctors", doctor);
+
+					} else {
+						map.put("Result", "fail");
+					}
+				}
+
 			}
 
 			js = new JSONObject(map);
@@ -305,18 +303,37 @@ public class DaoImpl implements Dao {
 		try {
 
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "insert ignore into people(GUIDPeople,PeopleCode,PeopleWeChat,country,avatarUrl)\r\n"
-					+ "VALUES(?,?,?,?,?)";
-			String sql1 = "SELECT * from people WHERE GUIDPeople = '" + params[0] + "'";
-
-			qr.update(sql, params);
+			String sql = "insert  into people(GUIDPeople,PeopleCode,PeopleWeChat,country,avatarUrl)\r\n"
+					+ "VALUES(?,?,?,?,?) ";
+			String sql1 = "SELECT * from people WHERE PeopleCode = '" + params[1] + "'";
 			people = qr.query(sql1, new BeanListHandler<PeopleBean>(PeopleBean.class));
 			if (people.size() != 0) {
 				map.put("Result", "success");
 				map.put("People", people);
 
 			} else {
-				map.put("Result", "fail");
+				int q = qr.update(sql, params);
+				if (q > 0) {
+
+					people = qr.query(sql1, new BeanListHandler<PeopleBean>(PeopleBean.class));
+					if (people.size() != 0) {
+						map.put("Result", "success");
+						map.put("People", people);
+
+					} else {
+						map.put("Result", "fail");
+					}
+				} else {
+					people = qr.query(sql1, new BeanListHandler<PeopleBean>(PeopleBean.class));
+					if (people.size() != 0) {
+						map.put("Result", "success");
+						map.put("People", people);
+
+					} else {
+						map.put("Result", "fail");
+					}
+				}
+
 			}
 
 			js = new JSONObject(map);
@@ -445,10 +462,11 @@ public class DaoImpl implements Dao {
 		String datetime = df.format(new Date());
 		Object[] params = { GUIDFocus, peopleCode, doctorCode, datetime };
 		try {
-			QueryRunner qr =  new QueryRunner(C3P0Utils.getDataSource());
-			String query1 = "SELECT * from peoplefocuslist WHERE PeopleCode = '" + peopleCode + "' and FocusDoctorCode ='" + doctorCode + "'";
-			List<IsfocusedBean> q = qr.query(query1,new BeanListHandler<IsfocusedBean>(IsfocusedBean.class));
-			if(q.size() == 0) {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+			String query1 = "SELECT * from peoplefocuslist WHERE PeopleCode = '" + peopleCode
+					+ "' and FocusDoctorCode ='" + doctorCode + "'";
+			List<IsfocusedBean> q = qr.query(query1, new BeanListHandler<IsfocusedBean>(IsfocusedBean.class));
+			if (q.size() == 0) {
 				String sql = "insert into peoplefocuslist  (GUIDFocus,PeopleCode,FocusDoctorCode,FocusTime)VALUES(?,?,?,?)";
 				int r = qr.update(sql, params);
 				if (r > 0) {
@@ -456,8 +474,9 @@ public class DaoImpl implements Dao {
 				} else {
 					map.put("Result", "关注失败");
 				}
-			}else {
-				String delete = "delete from peoplefocuslist WHERE PeopleCode = '" + peopleCode + "' and FocusDoctorCode ='" + doctorCode + "'";
+			} else {
+				String delete = "delete from peoplefocuslist WHERE PeopleCode = '" + peopleCode
+						+ "' and FocusDoctorCode ='" + doctorCode + "'";
 				int d = qr.update(delete);
 				if (d > 0) {
 					map.put("Result", "取消关注成功");
@@ -465,7 +484,7 @@ public class DaoImpl implements Dao {
 					map.put("Result", "取消关注失败");
 				}
 			}
-			
+
 			js = new JSONObject(map);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -482,7 +501,8 @@ public class DaoImpl implements Dao {
 		Object[] params = { peopleCode, doctorCode };
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "SELECT * from peoplefocuslist WHERE PeopleCode = '" + peopleCode + "' and FocusDoctorCode = '" + doctorCode + "'";
+			String sql = "SELECT * from peoplefocuslist WHERE PeopleCode = '" + peopleCode + "' and FocusDoctorCode = '"
+					+ doctorCode + "'";
 			Isfocused = qr.query(sql, new BeanListHandler<IsfocusedBean>(IsfocusedBean.class));
 			if (Isfocused.size() > 0) {
 				map.put("Result", "已关注");
@@ -497,19 +517,18 @@ public class DaoImpl implements Dao {
 		System.out.println(JSON.toJSONString(js));
 		return JSON.toJSONString(js);
 	}
-//完善医生信息
-	public String postDoctorInfo(Object[] doctorinfo, String manCode,String hospital) {
+
+	// 完善医生信息
+	public String postDoctorInfo(Object[] doctorinfo, String manCode, String hospital) {
 		Map map = new HashMap();
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
 			String sql = "update medicinedoctor  set ReleaseTime=?,Hospital=?,HospitalDepartment=?,ManName=?,ManName=?,ProfessionalTitle=?,\r\n"
 					+ "				ManMail=?,ManMobilePhone=?,ManIDCard=?,ManResume=?,ManDiagnose=?,ManAchievement=?,ManAward=?,ManNation=?,\r\n"
-					+ "				WorkTime=?,OpenId=? WHERE ManCode = '" + manCode
-					+ "'";
-		  
-			
+					+ "				WorkTime=?,OpenId=? WHERE ManCode = '" + manCode + "'";
+
 			int d = qr.update(sql, doctorinfo);
-			if(d>0) {
+			if (d > 0) {
 				map.put("Result", "success");
 			} else {
 				map.put("Result", "fail");
@@ -522,17 +541,18 @@ public class DaoImpl implements Dao {
 		System.out.println(JSON.toJSONString(js));
 		return JSON.toJSONString(js);
 	}
-//完善患者信息
+
+	// 完善患者信息
 	public String postPeopleInfo(Object[] peopleinfo, String peopleCode) {
 		Map map = new HashMap();
 		try {
-			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "update people SET PeopleName =?,gender=?,PeopleNation=?,phoneNumber=?,OpenId=?  "
-					+ "WHERE PeopleCode = '" + peopleCode+ "'";
-					
 
-			int d = qr.update(sql,peopleinfo);
-			if(d>0) {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+			String sql = "update people SET PeopleName =?,gender=?,PeopleNation=?,PeopleIDCard=?,phoneNumber=?,OpenId=? ,ReleaseTime=? "
+					+ "WHERE PeopleCode = '" + peopleCode + "'";
+
+			int d = qr.update(sql, peopleinfo);
+			if (d > 0) {
 				map.put("Result", "success");
 			} else {
 				map.put("Result", "fail");
@@ -541,22 +561,26 @@ public class DaoImpl implements Dao {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+
 		}
-		System.out.println(JSON.toJSONString(js));
+
 		return JSON.toJSONString(js);
 	}
-//查询我的医生
+
+	// 查询我的医生
 	public String queryMyDoctor(String peopleCode) {
 		List<DoctorBean> doctor;
 		Map map = new HashMap();
 		String jsonString2 = null;
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-				String sql = "select  medicinedoctor.*,worktime.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n" + 
-						"					FROM medicinedoctor left join hospitalorganization on medicinedoctor.HospitalOrganizationCode = hospitalorganization.HospitalOrganizationCode\r\n" + 
-						"					left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode\r\n" + 
-						"			left join worktime on medicinedoctor.GUIDMan = worktime.GUIDMan\r\n" + 
-						"					where medicinedoctor.ManCode = (   SELECT FocusDoctorCode  FROM peoplefocuslist where PeopleCode = '" + peopleCode + "')";
+			String sql = "select  medicinedoctor.*,worktime.*,hospitalorganization.HospitalOrganizationName,hospitallist.HospitalName\r\n"
+					+ "					FROM medicinedoctor left join hospitalorganization on medicinedoctor.HospitalOrganizationCode = hospitalorganization.HospitalOrganizationCode\r\n"
+					+ "					left join hospitallist on hospitalorganization.HospitalCode = hospitallist.HospitalCode\r\n"
+					+ "			left join worktime on medicinedoctor.GUIDMan = worktime.GUIDMan\r\n"
+					+ "					where medicinedoctor.ManCode in (   SELECT FocusDoctorCode  FROM peoplefocuslist where PeopleCode = '"
+					+ peopleCode + "')";
 			doctor = qr.query(sql, new BeanListHandler<DoctorBean>(DoctorBean.class));
 			if (doctor.size() != 0) {
 				map.put("Result", "success");
@@ -573,15 +597,16 @@ public class DaoImpl implements Dao {
 		}
 		return JSON.toJSONString(js);
 	}
-//查询患者个人信息
+
+	// 查询患者个人信息
 	public String queryPeopleInfo(String peopleCode) {
 		List<PeopleBean> people;
 		Map map = new HashMap();
 		String jsonString2 = null;
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-				String sql = "select * from people where PeopleCode = "+peopleCode;
-				people = qr.query(sql, new BeanListHandler<PeopleBean>(PeopleBean.class));
+			String sql = "select * from people where PeopleCode = " + peopleCode;
+			people = qr.query(sql, new BeanListHandler<PeopleBean>(PeopleBean.class));
 			if (people.size() != 0) {
 				map.put("Result", "success");
 				map.put("People", people);
@@ -598,15 +623,15 @@ public class DaoImpl implements Dao {
 		return JSON.toJSONString(js);
 	}
 
-	//查询患者病历
+	// 查询患者病历
 	public String queryPeopleCase(String peopleCode) {
 		List<PeopleCaseBean> peopleCase;
 		Map map = new HashMap();
 		String jsonString2 = null;
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-				String sql = "SELECT * FROM `peoplecaselist` WHERE PeopleCode = '"+peopleCode+"'";
-				peopleCase = qr.query(sql, new BeanListHandler<PeopleCaseBean>(PeopleCaseBean.class));
+			String sql = "SELECT * FROM `peoplecaselist` WHERE PeopleCode = '" + peopleCode + "'";
+			peopleCase = qr.query(sql, new BeanListHandler<PeopleCaseBean>(PeopleCaseBean.class));
 			if (peopleCase.size() != 0) {
 				map.put("Result", "success");
 				map.put("PeopleCase", peopleCase);
@@ -622,17 +647,19 @@ public class DaoImpl implements Dao {
 		}
 		return JSON.toJSONString(js);
 	}
-//收藏文章
+
+	// 收藏文章
 	public String collectArticle(String gUIDPeople, String gUIDArticle) {
 		List<PeopleCollectionBean> peopleCollection;
 		Map map = new HashMap();
 		String GUIDCollection = java.util.UUID.randomUUID().toString().replaceAll("-", "");
-		Object[] params = { GUIDCollection,gUIDPeople, gUIDArticle ,new Date()};
+		Object[] params = { GUIDCollection, gUIDPeople, gUIDArticle, new Date() };
 		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "SELECT * from people_collection WHERE GUIDPeople = '" + gUIDPeople + "' and GUIDArticle = '" + gUIDArticle + "'";
+			String sql = "SELECT * from people_collection WHERE GUIDPeople = '" + gUIDPeople + "' and GUIDArticle = '"
+					+ gUIDArticle + "'";
 			peopleCollection = qr.query(sql, new BeanListHandler<PeopleCollectionBean>(PeopleCollectionBean.class));
-			if(peopleCollection.size() == 0) {
+			if (peopleCollection.size() == 0) {
 				String sql1 = "insert into people_collection  (GUIDCollection,GUIDPeople,GUIDArticle,collect_time)VALUES(?,?,?,?)";
 				int r = qr.update(sql1, params);
 				if (r > 0) {
@@ -640,9 +667,10 @@ public class DaoImpl implements Dao {
 				} else {
 					map.put("Result", "收藏失败");
 				}
-			}else {
-				
-				String delete = "delete from people_collection WHERE GUIDPeople = '" + gUIDPeople + "' and GUIDArticle ='" + gUIDArticle + "'";
+			} else {
+
+				String delete = "delete from people_collection WHERE GUIDPeople = '" + gUIDPeople
+						+ "' and GUIDArticle ='" + gUIDArticle + "'";
 				int d = qr.update(delete);
 				if (d > 0) {
 					map.put("Result", "取消收藏成功");
@@ -659,7 +687,8 @@ public class DaoImpl implements Dao {
 		System.out.println(JSON.toJSONString(js));
 		return JSON.toJSONString(js);
 	}
-//19.查看患者收藏的文章
+
+	// 查看患者收藏的文章
 	public String queryPeopleCollection(String gUIDPeople) {
 
 		List<ArticleDoctorBean> article;
@@ -670,7 +699,8 @@ public class DaoImpl implements Dao {
 			String sql = "SELECT article.*,medicinedoctor.ManName,articlestatus.*"
 					+ " FROM article left join medicinedoctor on article.GUIDMan = medicinedoctor.GUIDMan"
 					+ " left join articlestatus on article.GUIDArticleStatus = articlestatus.GUIDArticleStatus"
-					+ " where article.GUIDArticle = (SELECT GUIDArticle FROM people_collection WHERE GUIDPeople = '"+gUIDPeople+"')";
+					+ " where article.GUIDArticle in (SELECT GUIDArticle FROM people_collection WHERE GUIDPeople = '"
+					+ gUIDPeople + "')";
 			article = qr.query(sql, new BeanListHandler<ArticleDoctorBean>(ArticleDoctorBean.class));
 			if (article.size() != 0) {
 				map.put("Result", "success");
@@ -688,20 +718,20 @@ public class DaoImpl implements Dao {
 		return JSON.toJSONString(js);
 	}
 
-	//查看患者是否收藏文章
+	// 查看患者是否收藏文章
 	public String isCollected(String gUIDPeople, String gUIDArticle) {
 		List<PeopleCollectionBean> peopleCollection;
 		Map map = new HashMap();
-			try {
+		try {
 			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
-			String sql = "SELECT * from people_collection WHERE GUIDPeople = '" + gUIDPeople + "' and GUIDArticle = '" + gUIDArticle + "'";
+			String sql = "SELECT * from people_collection WHERE GUIDPeople = '" + gUIDPeople + "' and GUIDArticle = '"
+					+ gUIDArticle + "'";
 			peopleCollection = qr.query(sql, new BeanListHandler<PeopleCollectionBean>(PeopleCollectionBean.class));
-			if(peopleCollection.size() == 0) {
-					map.put("Result", "未收藏");
-				} else {
-					map.put("Result", "已收藏");
-				}
-		
+			if (peopleCollection.size() == 0) {
+				map.put("Result", "未收藏");
+			} else {
+				map.put("Result", "已收藏");
+			}
 
 			js = new JSONObject(map);
 		} catch (SQLException e) {
@@ -709,6 +739,54 @@ public class DaoImpl implements Dao {
 			e.printStackTrace();
 		}
 		System.out.println(JSON.toJSONString(js));
+		return JSON.toJSONString(js);
+	}
+
+	// 提交医生工作时间
+	public String postDoctorWorktime(Object[] obj) {
+		Map map = new HashMap();
+
+		try {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+			String sql = "replace  into worktime (GUIDMan,GUIDWorkTime,WorkTime,WorkPlace,ReleaseTime)values(?,?,?,?,?)";
+				int q = qr.update(sql, obj);
+			if (q > 0) {
+				map.put("Result", "success");
+
+			} else {
+				map.put("Result", "fail");
+			}
+
+			js = new JSONObject(map);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return JSON.toJSONString(js);
+	}
+
+	//查看医生工作时间
+	public String getDoctorWorktime(String gUIDMan) {
+		List<WorktimeBean> worktime;
+		Map map = new HashMap();
+		String jsonString2 = null;
+		try {
+			QueryRunner qr = new QueryRunner(C3P0Utils.getDataSource());
+			String sql = "SELECT * FROM worktime WHERE GUIDMan = '" + gUIDMan + "'";
+			worktime = qr.query(sql, new BeanListHandler<WorktimeBean>(WorktimeBean.class));
+			if (worktime.size() != 0) {
+				map.put("Result", "success");
+				map.put("PeopleCase", worktime);
+
+			} else {
+				map.put("Result", "fail");
+			}
+
+			js = new JSONObject(map);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return JSON.toJSONString(js);
 	}
 

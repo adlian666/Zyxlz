@@ -6,7 +6,6 @@ public interface Dao {
 
 String findAll();
 String getArticles(String str);
-String postUserInfo(Object[] params);
 String queryHospitalList();
 String queryOrganizationDoctor(String str);
 String uploadCase(PeopleCaseBean peoplecase);
@@ -27,6 +26,8 @@ String queryPeopleCase(String peopleCode);
 String collectArticle(String gUIDPeople, String gUIDArticle);
 String queryPeopleCollection(String gUIDPeople);
 String isCollected(String gUIDPeople, String gUIDArticle);
+String postDoctorWorktime(Object[] obj);
+String getDoctorWorktime(String gUIDMan);
 
 
 

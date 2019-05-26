@@ -36,10 +36,11 @@ public class PeopleLoginServlet extends HttpServlet {
 		String country  = request.getParameter("country");
 		String avatarUrl = request.getParameter("avatarUrl");
 		String code = request.getParameter("code");
-		String mancode = request.getParameter("caInnercode");
-		String openId = request.getParameter("openId");
+		String peoplecode = request.getParameter("caInnercode");
+		
+		String GUIDPeople = java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		String FormId = request.getParameter("FormId");
-		Object[] params = {openId,mancode,nickName,country,avatarUrl};
+		Object[] params = {GUIDPeople,peoplecode,nickName,country,avatarUrl};
 		//调用添加方法
 		String str = service.peopleLogin(params);
 		response.setCharacterEncoding("UTF_8");
@@ -59,10 +60,11 @@ public class PeopleLoginServlet extends HttpServlet {
 		String country  = request.getParameter("country");
 		String avatarUrl = request.getParameter("avatarUrl");
 		String code = request.getParameter("code");
-		String mancode = request.getParameter("caInnercode");
-		String openId = request.getParameter("openId");
+		String peoplecode = request.getParameter("caInnercode");
+	
+		String GUIDPeople = java.util.UUID.randomUUID().toString().replaceAll("-", "");
 		String FormId = request.getParameter("FormId");
-		Object[] params = {openId,mancode,nickName,country,avatarUrl};
+		Object[] params = {GUIDPeople,peoplecode,nickName,country,avatarUrl};
 		//调用添加方法
 		String str = service.peopleLogin(params);
 		response.setCharacterEncoding("UTF_8");

@@ -110,11 +110,12 @@ public class PeopleUploadServlet extends HttpServlet {
 				// BeanUtils.populate(peoplecase, map);
 
 				String GUIDCase = java.util.UUID.randomUUID().toString().replaceAll("-", "");
-				peoplecase.setCaseContent(map.get("CaseContent").toString());
+				peoplecase.setCaseContent(map.get("caseContent").toString());
 				peoplecase.setGUIDCase(GUIDCase);
-				peoplecase.setPeopleCode(map.get("PeopleCode").toString());
+				peoplecase.setGUIDPeople(map.get("gUIDPeople").toString());
+				peoplecase.setPeopleCode(map.get("peopleCode").toString());
 				//peoplecase.setGUIDPeople(map.get("PeopleCode").toString());
-				peoplecase.setCaseContent(map.get("CaseContent").toString());
+				peoplecase.setCaseContent(map.get("caseContent").toString());
 				peoplecase.setCaseAttachment(imgurl);
 				peoplecase.setCaseTime(new Date());
 				peoplecase.setReleaseTime(new Date());
